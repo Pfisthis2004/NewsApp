@@ -52,7 +52,7 @@ class ArticleFragment : Fragment(R.layout.fragment_article) {
             // Gọi ViewModel để thêm bài báo vào mục yêu thích
             newsViewModel.addToFavourites(article)
             // Hiện thông báo Snackbar ở dưới màn hình
-            Snackbar.make(view, "Added to favourite", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(view, "Đã thêm vào bản tin yêu thích", Snackbar.LENGTH_SHORT).show()
         }
     }
 }

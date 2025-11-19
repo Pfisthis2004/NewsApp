@@ -7,11 +7,11 @@ import com.example.newsapp.models.Article
 import retrofit2.Retrofit
 
 class NewsRepository(val db: ArticleDatabase) {
-    suspend fun getHeadlines(contryCode: String,pageNumber: Int)=
-        RetrofitInstance.api.getHeadLines(contryCode,pageNumber)
+    suspend fun getHeadlines(countryCode: String, lang: String ="vi", page: Int, maxResults: Int =10)=
+        RetrofitInstance.api.getHeadLines(countryCode, lang, page,maxResults )
 
-    suspend fun searchNews(searchQuery: String,pageNumber: Int)=
-        RetrofitInstance.api.searchForNews(searchQuery,pageNumber)
+    suspend fun searchNews(searchQuery: String,lang: String ="vi",countryCode: String ="vn", maxResults: Int=10)=
+        RetrofitInstance.api.searchForNews(searchQuery, lang,countryCode,maxResults)
 
     suspend fun upsert(article: Article) = db.getArticleDao().upsert(article)
 

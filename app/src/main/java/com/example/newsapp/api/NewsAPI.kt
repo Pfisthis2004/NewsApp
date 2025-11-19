@@ -7,23 +7,21 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface NewsAPI {
-    @GET("v2/top-headlines") // nạp điểm cuối của api
+    @GET("api/v4/top-headlines") // nạp điểm cuối của api
     suspend fun getHeadLines(
-        @Query("country")
-        contryCode: String ="us", // tham so ma quoc qia
-        @Query("page")
-        pageNumber: Int =1, // tham so trang
-        @Query("apiKey")
-        apiKey: String = API_KEY // tham so khóa api
+        @Query("country") countryCode: String = "vn",
+        @Query("lang") lang: String = "vi",
+        @Query("page") page: Int,
+        @Query("max") maxResults: Int = 10,
+        @Query("apikey") apiKey: String = API_KEY
     ): Response<NewsReponse>
 
-    @GET("v2/everything")
+    @GET("api/v4/search")
     suspend fun searchForNews(
-        @Query("q")
-        searchQuery: String,
-        @Query("page")
-        pageNumber: Int =1, // tham so trang
-        @Query("apiKey")
-        apiKey: String = API_KEY // tham so khóa api
+        @Query("q") searchQuery: String,
+        @Query("lang") lang: String = "vi",
+        @Query("country") countryCode: String = "vn",
+        @Query("max") maxResults: Int = 10,
+        @Query("apikey") apiKey: String = API_KEY
     ): Response<NewsReponse>
 }

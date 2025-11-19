@@ -30,7 +30,7 @@
         android:textSize="14sp"
         android:drawableTint="@color/purple"
         android:background="@drawable/search_border"
-        android:drawableEnd="@drawable/outline_document_search_24"
+        android:drawableEnd="@drawable/outline_manage_search_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

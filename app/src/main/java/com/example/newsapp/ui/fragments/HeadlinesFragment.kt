@@ -46,8 +46,7 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
         itemHeadlinesError = view.findViewById(R.id.itemHeadlinesError)
 
         // Inflate layout item_error.xml để lấy retryButton và errorText
-        val inflater =
-            requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view: View = inflater.inflate(R.layout.item_error, null)
 
         retryButton = view.findViewById(R.id.retryButton)
@@ -68,6 +67,15 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
                 R.id.action_headlinesFragment_to_articleFragment,
                 bundle
             )
+        }
+        binding.btnNextPage.setOnClickListener {
+            newsViewModel.nextPage("vn")
+            binding.tvCurrentPage.text = newsViewModel.headlinesPage.toString()
+        }
+
+        binding.btnPrevPage.setOnClickListener {
+            newsViewModel.prevPage("vn")
+            binding.tvCurrentPage.text = newsViewModel.headlinesPage.toString()
         }
 
         // Quan sát LiveData headlines từ ViewModel
@@ -96,7 +104,7 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
                     response.message?.let { message ->
                         Toast.makeText(
                             activity,
-                            "Sorry Error: $message",
+                            "lỗi: $message",
                             Toast.LENGTH_LONG
                         ).show()
                         showErrorMessage(message)
@@ -111,7 +119,7 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
 
         // Nút retry khi load lỗi
         retryButton.setOnClickListener {
-            newsViewModel.getHeadLines("us")
+            newsViewModel.getHeadLines("vn")
         }
     }
 
@@ -121,7 +129,7 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
     var isLastPage = false
     var isScrolling = false
 
-    // Ẩn ProgressBar (⚠️ hiện tại code đang set VISIBLE → nên chỉnh thành GONE mới đúng)
+    // Ẩn ProgressBar
     private fun hideProgressBar() {
         binding.paginationProgressBar.visibility = View.INVISIBLE
         isLoading = false
@@ -153,15 +161,14 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
             super.onScrolled(recyclerView, dx, dy)
 
             val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-            val fistVisibilityItemPosition = layoutManager.findFirstVisibleItemPosition()
+            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
             val visibleItemCount = layoutManager.childCount
             val totalItemCount = layoutManager.itemCount
 
-            // Các điều kiện để phân trang
             val isNoError = !isError
             val isNotLoadingAndNotLastPage = !isLoading && !isLastPage
-            val isAtLastItem = fistVisibilityItemPosition + visibleItemCount >= totalItemCount
-            val isNotAtBeginning = fistVisibilityItemPosition >= 0
+            val isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
+            val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= Constants.QUERY_PAGE_SIZE
 
             val shouldPaginate =
@@ -169,11 +176,13 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
                         isNotAtBeginning && isTotalMoreThanVisible && isScrolling
 
             if (shouldPaginate) {
-                newsViewModel.getHeadLines("us")
+                newsViewModel.getHeadLines("vn")
                 isScrolling = false
             }
-        }
 
+            // Hiển thị nút chuyển trang khi cuộn đến cuối
+            binding.paginationControls.visibility = if (isAtLastItem) View.VISIBLE else View.GONE
+        }
 
         // Kiểm tra khi người dùng bắt đầu cuộn (touch scroll)
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -194,4 +203,5 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
             addOnScrollListener(this@HeadlinesFragment.srollListener)
         }
     }
+
 }

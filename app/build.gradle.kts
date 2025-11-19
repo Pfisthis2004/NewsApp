@@ -39,6 +39,20 @@ android {
         viewBinding = true
     }
 }
+tasks.register("cleanKspCache") {
+    doLast {
+        val kspCacheDir = file("build/kspCaches")
+        if (kspCacheDir.exists()) {
+            println("Deleting KSP cache at: ${kspCacheDir.absolutePath}")
+            kspCacheDir.deleteRecursively()
+        }
+    }
+}
+
+// Chạy cleanKspCache trước khi build debug
+tasks.named("preBuild") {
+    dependsOn("cleanKspCache")
+}
 
 dependencies {
 

@@ -112,7 +112,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                     response.message?.let { message ->
                         Toast.makeText(
                             activity,
-                            "Sorry Error: $message",
+                            "Lỗi: $message",
                             Toast.LENGTH_LONG
                         ).show()
                         showErrorMessage(message)
@@ -141,7 +141,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     var isLastPage = false
     var isScrolling = false
 
-    // Ẩn ProgressBar (⚠️ hiện tại code đang set VISIBLE → nên chỉnh thành GONE mới đúng)
+    // Ẩn ProgressBar
     private fun hideProgressBar() {
         binding.paginationProgressBar.visibility = View.INVISIBLE
         isLoading = false

@@ -29,9 +29,10 @@ class NewsViewModel(app: Application, val newsRepository: NewsRepository): Andro
     var searchNewsReponse: NewsReponse?= null
     var newSearchQuery: String?= null
     var oldSearchQuery: String?=null
+    private val maxResult =10
 
     init {
-        getHeadLines("us")
+        getHeadLines("vn")
     }
 
     fun getHeadLines(countryCode: String) = viewModelScope.launch {
@@ -41,22 +42,23 @@ class NewsViewModel(app: Application, val newsRepository: NewsRepository): Andro
     fun searchNews(searchQuery: String) = viewModelScope.launch {
         searchNewsInternet(searchQuery)
     }
+    fun nextPage(countryCode: String) {
+        headlinesPage++
+        getHeadLines(countryCode)
+    }
 
-    private fun handHeadLinesResponse(reponse: Response<NewsReponse>): Resource<NewsReponse>{
-        if (reponse.isSuccessful){
-            reponse.body()?.let {
-                resultResponse -> headlinesPage++
-                if (headlinesResponse == null){
-                    headlinesResponse = resultResponse
-                }else{
-                    val oldArticle = headlinesResponse?.articles
-                    val newArticle = resultResponse.articles
-                    oldArticle?.addAll(newArticle)
-                }
-                return Resource.Success(headlinesResponse ?: resultResponse)
-            }
+    fun prevPage(countryCode: String) {
+        if (headlinesPage > 1) {
+            headlinesPage--
+            getHeadLines(countryCode)
         }
-        return Resource.Error(reponse.message())
+    }
+    private fun handHeadLinesResponse(response: Response<NewsReponse>): Resource<NewsReponse>{
+        return if (response.isSuccessful) {
+            response.body()?.let { Resource.Success(it) } ?: Resource.Error("Empty response")
+        } else {
+            Resource.Error(response.message())
+        }
     }
 
     private fun handleSearchNewsReponse(reponse: Response<NewsReponse>): Resource<NewsReponse>{
@@ -122,11 +124,10 @@ class NewsViewModel(app: Application, val newsRepository: NewsRepository): Andro
             if (InternetConnection(this.getApplication())) {
 
                 // 3) Gọi API lấy headlines từ repository (theo trang headlinesPage)
-                val reponse = newsRepository.getHeadlines(countryCode, headlinesPage)
+                val reponse = newsRepository.getHeadlines(countryCode, lang ="vi", page = headlinesPage,maxResult)
 
                 // 4) Xử lý phản hồi: gộp trang, tăng page nếu thành công, bọc vào Resource.Success / Error
                 headlines.postValue(handHeadLinesResponse(reponse))
-
             } else {
                 // 5) Không có mạng → phát ra trạng thái lỗi để UI hiển thị thông báo
                 headlines.postValue(Resource.Error("No internet connection"))
@@ -152,7 +153,7 @@ class NewsViewModel(app: Application, val newsRepository: NewsRepository): Andro
             if (InternetConnection(this.getApplication())) {
 
                 // 4) Gọi API searchNews trong repository, truyền vào query và page hiện tại
-                val reponse = newsRepository.searchNews(searchQuery, searchNewsPage)
+                val reponse = newsRepository.searchNews(searchQuery, lang ="vi", countryCode = "vn",maxResult)
 
                 // 5) Xử lý response (gộp dữ liệu, tăng page, hoặc báo lỗi)
                 searchNews.postValue(handleSearchNewsReponse(reponse))
